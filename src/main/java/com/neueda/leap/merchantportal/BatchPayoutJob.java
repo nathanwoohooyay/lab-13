@@ -18,13 +18,13 @@ public class BatchPayoutJob {
         for (PayoutRequest payout : approvedPayouts) {
             try {
                 bankTransferClient.transfer(payout.getMerchantId(), payout.getAmount());
+                // Only persist PAID once the bank confirms the transfer succeeded.
                 payout.setApprovalStatus("PAID");
+                payoutRepository.save(payout);
             } catch (BankTransferException e) {
-                log.warn("Transfer failed for payout {}, marking paid anyway: {}",
+                log.error("Transfer failed for payout {}, leaving APPROVED for retry: {}",
                         payout.getId(), e.getMessage());
-                payout.setApprovalStatus("PAID");
             }
-            payoutRepository.save(payout);
         }
     }
 }
