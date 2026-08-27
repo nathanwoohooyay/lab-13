@@ -22,7 +22,7 @@ public class BatchPayoutJob {
             } catch (BankTransferException e) {
                 log.warn("Transfer failed for payout {}, marking paid anyway: {}",
                         payout.getId(), e.getMessage());
-                payout.setApprovalStatus("PAID");
+                payout.setApprovalStatus("FAILED");
             }
             payoutRepository.save(payout);
         }
